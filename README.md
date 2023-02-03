@@ -1,5 +1,5 @@
 # THIS IS NOT GOOD EXAMPLE CODE
-### Christ, its partually commented, highly repeative, poorly written, and doesnt even follow its own naming conventions
+### Christ, its partially commented, highly repeative, poorly written, and doesnt even follow its own naming conventions
 
 
 If you want an actual dive into this. Heres how it works:
