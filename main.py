@@ -1,5 +1,6 @@
 # openpyxl for excel worksheet opening
 import openpyxl as oxl
+import json
 # pyexcel_ods for excel and calc open standard opening
 from pyexcel_ods import get_data as calc
 # csv for creating comma separated value files
@@ -21,16 +22,18 @@ level6 = []
 # Classes for storing values (can scroll through)
 class person:
     # glorified dictonary
-    def __init__(self, name, rel, team, crt, prod):
+    def __init__(self, name, rel, team, crt, prod, pos, neg):
         self.name = name
         self.rel = rel
         self.team = team
         self.crt = crt
         self.prod = prod
+        self.pos = pos
+        self.neg = neg
 
     # formatting print command
     def __str__(self):
-        return f"{self.name},{self.rel},{self.team},{self.crt},{self.prod}"
+        return f"{self.name},{self.rel},{self.team},{self.crt},{self.prod},positive: {self.pos}, negative: {self.neg}"
 
     def isName(self, name):
         if name == self.name:
@@ -41,15 +44,20 @@ class person:
         return self.name
 
     def getCSV(self):
-        return f"{self.rel},{self.team},{self.crt},{self.prod}"
+        return [self.name, self.rel,self.team,self.crt,self.prod,self.pos,self.neg]
 
 class leader:
-    def __init__(self, name, mot, fair, cpt, cmt):
+    def __init__(self, name, mot, fair, cpt, cmt, pos, neg):
         self.name = name
         self.mot = mot
         self.fair = fair
         self.cpt = cpt
         self.cmt = cmt
+        self.pos = pos
+        self.neg = neg
+
+    def __str__(self):
+        return f"{self.name},{self.mot},{self.fair},{self.cpt},{self.cmt},positive: {self.pos}, negative: {self.neg}"
 
     def isName(self, name):
         if name == self.name:
@@ -60,7 +68,7 @@ class leader:
         return self.name
 
     def getCSV(self):
-        return f"{self.mot},{self.fair},{self.cpt},{self.cmt}"
+        return [self.name, self.mot, self.fair, self.cpt, self.cmt, self.pos, self.neg]
 
 
 
@@ -78,22 +86,49 @@ def main():
         # if its a standard excel format
         if extension == "xls" or extension == "xlsx":
             convert_xsl_dict(file)
-
         # if its an open standard
         elif extension == "ods":
             convert_ods_dict(file)
-
-
         else:
             throwErr("format", file)
 
-    # for person in level5:
-    #     print(person)
-    # for leader in level6:
-    #     print(leader)
-    # should equal 12 and 4 respectively (class amounts)
-    print(f"classmates accounted : {len(level5)/amountOfFiles}\nleaders accounted    : {len(level6)/amountOfFiles}")
+        # sort level 5s and 6, average them, return feedback.
+        # add feedback storage to classes. collect seperately for each person.
 
+    level5sort = {
+    }
+    level6sort = {
+
+    }
+
+    for entry in level5:
+        level5sort = condense_dict(level5sort, entry)
+    for entry in level6:
+        level6sort = condense_dict(level6sort, entry)
+
+    print(json.dumps(level5sort, indent=4))
+    print(json.dumps(level6sort, indent=4))
+
+    # should equal 12 and 4 respectively (class amounts)
+    print(f"classmates accounted : {len(level5sort)}\nleaders accounted    : {len(level6sort)}")
+
+
+def condense_dict(dict, entry):
+
+        e = entry.getCSV()
+        n = e[0]
+        r = e[1]
+        c = e[2]
+        t = e[3]
+        p = e[4]
+        ps = e[5]
+        ng = e[6]
+
+        if dict.get(n) is None:
+            dict.update({str(n): [{"1": r, "2": c, "3": t, "4": p, "pos": ps, "neg": ng}]})
+        else:
+            dict[n].append({"1": r, "2": c, "3": t, "4": p, "pos": ps, "neg": ng})
+        return dict
 
 def convert_ods_dict(file):
     ods = calc(f"{PATH}/{file}")
@@ -106,7 +141,7 @@ def convert_ods_dict(file):
         # make sure their score is correctly inputted or throw an error
         if p[6] == 0:
             # create object and add it to stores
-            e = person(p[0], p[1], p[2], p[3], p[4])
+            e = person(p[0], p[1], p[2], p[3], p[4], p[7], p[8])
             level5.append(e)
         elif me == 1 and meCheck is False:
             meCheck = True
@@ -120,7 +155,7 @@ def convert_ods_dict(file):
         l = ods["Sheet1"][i]
         me = l[9]
         if l[6] == 0:
-            e = leader(l[0], l[1], l[2], l[3], l[4])
+            e = leader(l[0], l[1], l[2], l[3], l[4],l[7],l[8])
             level6.append(e)
         elif me == 1 and meCheck is False:
             meCheck = True
@@ -140,9 +175,11 @@ def convert_xsl_dict(file):
         t = row[2].value
         c = row[3].value
         p = row[4].value
+        ps = row[7].value
+        ng = row[8].value
 
         if r + t + c + p == 100:
-            e = person(n, r, t, c, p)
+            e = person(n, r, t, c, p, ps, ng)
             level5.append(e)
         elif me == 1 and meCheck is False:
             meCheck = True
@@ -159,9 +196,11 @@ def convert_xsl_dict(file):
         t = row[2].value
         c = row[3].value
         p = row[4].value
+        ps = row[7].value
+        ng = row[8].value
 
         if r + t + c + p == 100:
-            e = leader(n, r, t, c, p)
+            e = leader(n, r, t, c, p, ps, ng)
             level6.append(e)
         elif me == 1 and meCheck is False:
             meCheck = True
