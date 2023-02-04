@@ -12,6 +12,7 @@ from os import remove
 
 # Constants
 PATH = "/home/user/Documents/TestFeedback"
+RESULT = "/home/user/Documents/FeedbackOutput"
 CLASSRANGE = [1,12]
 LEADERRANGE = [16,19]
 level5 = []
@@ -105,12 +106,93 @@ def main():
         level5sort = condense_dict(level5sort, entry)
     for entry in level6:
         level6sort = condense_dict(level6sort, entry)
+    f = open(f"{RESULT}/rawResults.json","a")
+    f.write(json.dumps(level5sort, indent=4))
+    f.write("\n")
+    f.write(json.dumps(level6sort, indent=4))
+    f.close()
 
-    print(json.dumps(level5sort, indent=4))
-    print(json.dumps(level6sort, indent=4))
+    # This is about the point in the night where making it neat didnt matter, and functions were a waste of energy
+    file = oxl.Workbook()
+    act = file.active
+
+    act.title = "Averages"
+
+    spreadsheetAmount = amountOfFiles
+
+    act["A1"] = "Members (AVGS)"
+    act["B1"] = "Reliability"
+    act["C1"] = "Teamwork"
+    act["D1"] = "Creativity"
+    act["E1"] = "Productivity"
+
+    row = 2
+
+    for member in level5sort:
+        file_writer(act, member, level5sort, row)
+        row += 1
+
+    row +=1
+    act[f"A{row}"] = "Leaders (AVGS)"
+    act[f"B{row}"] = "Motivating"
+    act[f"C{row}"] = "Fair"
+    act[f"D{row}"] = "Competency"
+    act[f"E{row}"] = "Commitment"
+    row +=1
+
+    for leader in level6sort:
+        file_writer(act, leader, level6sort, row)
+        row += 1
+
+
+    file.save(f"{RESULT}/Week-x-Averages.xlsx")
+
 
     # should equal 12 and 4 respectively (class amounts)
     print(f"classmates accounted : {len(level5sort)}\nleaders accounted    : {len(level6sort)}")
+
+def file_writer(writer, entity, dict, row):
+    # EXCEL THINGS
+    key = str(entity)
+    ref = dict[key]
+    submissions = len(ref)
+    a1 = sum_array(return_instances("1", ref)) / submissions
+    a2 = sum_array(return_instances("2", ref)) / submissions
+    a3 = sum_array(return_instances("3", ref)) / submissions
+    a4 = sum_array(return_instances("4", ref)) / submissions
+    writer[f"A{row}"] = key
+    writer[f"B{row}"] = a1
+    writer[f"C{row}"] = a2
+    writer[f"D{row}"] = a3
+    writer[f"E{row}"] = a4
+    # POSITIVE AND NEGATIVE POINT HANDLING
+    f = open(f"{RESULT}/{key}-feedback.txt","a")
+    pos = return_instances("pos", ref)
+    neg = return_instances("neg",ref)
+    f.write("What to do more of:\n")
+    for point in pos:
+        f.write(f"\t{point}\n")
+    f.write("What to do less of:\n")
+    for point in neg:
+        f.write(f"\t{point}\n")
+    f.close()
+
+
+
+def return_instances(key, list):
+    res = [sub[str(key)] for sub in list]
+    return res
+
+def sum_array(array):
+    s = 0
+    try:
+        for x in array:
+            s += x
+        return s
+
+    except TypeError:
+        return throwErr(err="type")
+
 
 
 def condense_dict(dict, entry):
@@ -216,11 +298,14 @@ def get_files(directory):
     files = [f for f in listdir(directory) if isfile(join(directory, f))]
     return files
 
-def throwErr(err, loc):
+def throwErr(err = "", loc = ""):
     if err == "total":
-        print(f"ERROR: {loc} has not been totalled correctly")
+        return print(f"ERROR: {loc} has not been totalled correctly")
     if err == "format":
-        print(f"ERROR: {loc} is not formatted correctly, only allows xslx, xsl, and ods")
+        return print(f"ERROR: {loc} is not formatted correctly, only allows xslx, xsl, and ods")
+    if err == "type":
+        return print("ERROR: theres text in one of the cells or something. wtf?")
+    return print("UNHANDLED: im pretty sure this wont ever get triggered")
 
 
 
