@@ -190,25 +190,25 @@ def sum_array(array):
     except TypeError:
         return throwErr(err="type")
 
-
+# Load values from CSV into dict and return
 def condense_dict(dict, entry):
-        # These are poorly named variables, dont look
-        e = entry.getCSV()
-        n = e[0]
-        r = e[1]
-        c = e[2]
-        t = e[3]
-        p = e[4]
-        ps = e[5]
-        ng = e[6]
+        # Grab values from CSV 
+        objValues = entry.getCSV()
+        name = objValues[0]
+        reliability = objValues[1]
+        creativity = objValues[2]
+        teamwork = objValues[3]
+        productivity = objValues[4]
+        positiveFeedback = objValues[5]
+        negitiveFeedback = objValues[6]
 
         # If the output doesnt already contains an instance of the person
         if dict.get(n) is None:
             # Create a new instance
-            dict.update({str(n): [{"1": r, "2": c, "3": t, "4": p, "pos": ps, "neg": ng}]})
+            dict.update({str(name): [{"1": reliability, "2": creativity, "3": teamwork, "4": productivity, "pos": positiveFeedback, "neg": negitiveFeedback}]})
         else:
-            # if they do already exist, just add the new stats on.
-            dict[n].append({"1": r, "2": c, "3": t, "4": p, "pos": ps, "neg": ng})
+            # If they do already exist, just add the new stats on.
+            dict[name].append({"1": reliability, "2": creativity, "3": teamwork, "4": productivity, "pos": positiveFeedback, "neg": negitiveFeedback})
         return dict
 
 
