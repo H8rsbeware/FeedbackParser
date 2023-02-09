@@ -10,8 +10,8 @@ from os.path import isfile, join
 
 
 # Constants
-PATH = "/home/user/Documents/UnweightedFeedback"
-RESULT = "/home/user/Documents/FeedbackOutput"
+PATH = "/Example-Input"
+RESULT = "/Example-Output"
 # Holds the row ranges for searching spreadsheets
 CLASSRANGE = [1,12]
 LEADERRANGE = [16,19]
