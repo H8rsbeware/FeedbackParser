@@ -1,16 +1,12 @@
-# THIS IS NOT GOOD EXAMPLE CODE
-### Christ, its partially commented, highly repeative, poorly written, and doesnt even follow its own naming conventions
+# Totally Ingenious Tallying System
+Do your teammates seem like they're slacking? Is there a rift between them, causing friction? Are they switching tabs as soon as you approach them? Wouldn't you rather have them staring at TITS? Introducing, **The Totally Ingenious Tallying System** (T.I.T.S), its is a way to keep your team focused and working efficiently together.
 
+By having team members ~~snitch~~ report on the work and attitudes of others, they can clearly see any faults and areas for improvement. 
 
-If you want an actual dive into this. Heres how it works:
+The system comes with some unique perks:
+- Anonymised feedback so users can't see who ~~ratted them out~~ rated them or how
+- Generalised scores for the team mean that the focus is on how **everyone** can improve together as a whole, and not just singling out a poor slacker.
+- Feedback is fed back into a formatted document that can be customised to suit your needs, whether for at-a-glance comprehension or in-depth review
+- Compiled reports over time provide automated statistical analysis of your team's ability to work together.
 
-1. script reads all files from a folder on my laptop
-2. it figures out what program you edited your spreadsheets on
-  - this one probably only applies to me, since I use an alternative to excel.
-3. it searches all the files and collects relevent information
-  - this includes each persons row. 
-  - the files themselves ask who you are, this is for debugging purposes to make sure errors arent triggered wrongly (promise not to look at them and they wont be posted here.
-4. each row is formatted into a "standard class" to be handled
-  - these are technically seperated into leaders and members (not the naming scheme tho)
-5. all entries are sorted into a main dictonary, which holds an entry for each person, and then each persons 4 scores and the comments
-6. it averages out all of that overwhelming number stuff, putting in it a new spreadsheet, with a collection of comments file for each person (so you dont have to share it out loud).
+Ingenious is wrapped up in a tidy, modern GUI providing easy access and installation for your team. Customizability is simple and streamlined, allowing you to get relevant, targeted feedback fast from your team and for you to generate those reports instantly. 
