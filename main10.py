@@ -10,52 +10,25 @@ from os.path import isfile, join
 
 
 # Constants
-PATH = "/Example-Input"
-RESULT = "/Example-Output"
-# Holds the row ranges for searching spreadsheets
-CLASSRANGE = [1,12]
-LEADERRANGE = [16,19]
+PATH = "/home/user/Documents/UnweightedFeedback"
+RESULT = "/home/user/Documents/FeedbackOutput"
+
+RANGES = [[2,13],[16,19]]
 
 # Stores bulk data from file reads
 level5 = []
 level6 = []
 
-# The classes act like a standardised data structure, making it easier to handle data
-class person:
-    def __init__(self, name, rel, team, crt, prod, pos, neg):
-        self.name = name
-        self.rel = rel
-        self.team = team
-        self.crt = crt
-        self.prod = prod
-        self.pos = pos
-        self.neg = neg
-
-    # formatting print command
+# Class as a datastructure for rows
+class cRow:
+    def __init__(self, key, values=[], strings=[]):
+        self.key = key
+        self.values = values
+        self.strings = strings
     def __str__(self):
-        return f"{self.name},{self.rel},{self.team},{self.crt},{self.prod},positive: {self.pos}, negative: {self.neg}"
-
-    # Returns all values in an array, with no formatting
+        return f"{self.key} : \n\tvalues:{str(self.values)}\n\tstrings:{str(self.strings)}"
     def getCSV(self):
-        return [self.name, self.rel,self.team,self.crt,self.prod,self.pos,self.neg]
-
-# Leader class is kind of redundant, could of been condensed into one class
-class leader:
-    def __init__(self, name, mot, fair, cpt, cmt, pos, neg):
-        self.name = name
-        self.mot = mot
-        self.fair = fair
-        self.cpt = cpt
-        self.cmt = cmt
-        self.pos = pos
-        self.neg = neg
-
-    def __str__(self):
-        return f"{self.name},{self.mot},{self.fair},{self.cpt},{self.cmt},positive: {self.pos}, negative: {self.neg}"
-
-    def getCSV(self):
-        return [self.name, self.mot, self.fair, self.cpt, self.cmt, self.pos, self.neg]
-
+        return [self.key, self.values, self.strings]
 
 
 def main():
@@ -148,10 +121,10 @@ def file_writer(writer, entity, dict, row):
     ref = dict[key]
     submissions = len(ref)
     # Averages are calculated (sum of scores in category, divided by responses to that category
-    avgC1 = sum_array(return_instances("1", ref)) / submissions
-    avgC2 = sum_array(return_instances("2", ref)) / submissions
-    avgC3 = sum_array(return_instances("3", ref)) / submissions
-    avgC4 = sum_array(return_instances("4", ref)) / submissions
+    avgC1 = sum_array(return_instances("v1", ref)) / submissions
+    avgC2 = sum_array(return_instances("v2", ref)) / submissions
+    avgC3 = sum_array(return_instances("v3", ref)) / submissions
+    avgC4 = sum_array(return_instances("v4", ref)) / submissions
     avgTotal = (avgC1 + avgC2 + avgC3 + avgC4)
     # Writes them to the spreadsheet
     writer[f"A{row}"] = key
@@ -164,8 +137,8 @@ def file_writer(writer, entity, dict, row):
     # POSITIVE AND NEGATIVE POINT HANDLING
     # creates a new file under the persons name
     f = open(f"{RESULT}/{key}-feedback.txt","a")
-    pos = return_instances("pos", ref)
-    neg = return_instances("neg",ref)
+    pos = return_instances("s1", ref)
+    neg = return_instances("s2",ref)
     # Adds all positive feedback
     f.write("What to do more of:\n")
     for point in pos:
@@ -198,93 +171,82 @@ def sum_array(array):
 def condense_dict(dict, entry):
         # These are poorly named variables, dont look
         e = entry.getCSV()
-        n = e[0]
-        r = e[1]
-        c = e[2]
-        t = e[3]
-        p = e[4]
-        ps = e[5]
-        ng = e[6]
+        key = e[0]
+        values = e[1]
+        strings = e[2]
+
+        tempDict = {}
+        i = 1
+        for value in values:
+            tempDict[f"v{i}"] = value
+            i += 1
+        i = 1
+        for rope in strings:
+            tempDict[f"s{i}"] = rope
+            i += 1
+            
 
         # If the output doesnt already contains an instance of the person
-        if dict.get(n) is None:
+        if dict.get(key) is None:
             # Create a new instance
-            dict.update({str(n): [{"1": r, "2": c, "3": t, "4": p, "pos": ps, "neg": ng}]})
+            dict.update({str(key): [tempDict]})
         else:
             # if they do already exist, just add the new stats on.
-            dict[n].append({"1": r, "2": c, "3": t, "4": p, "pos": ps, "neg": ng})
+            dict[key].append(tempDict)
         return dict
 
 
 # Both convert_file_dict just take a file type, and change each row into a standard class
 def convert_ods_dict(file, inlMaxValue=40, inlMinValue=0):
     ods = calc(f"{PATH}/{file}", data_only=True)
-    # for each team member
-    for i in range(CLASSRANGE[0], CLASSRANGE[1] + 1):
-        # grab their row
-        p = ods["Sheet1"][i]
-        print(p)
-        # make sure their score is correctly inputted or throw an error
-        if inlMinValue <= p[5] <= inlMaxValue:
-            # create object and add it to stores
-            e = person(p[0], p[1], p[2], p[3], p[4], p[6], p[7])
-            level5.append(e)
-        else:
-            level5.append({"name":p[0], "error":"wrong values"})
-            throwErr("total", f"{file}:{p[0]}")
-
-    # works the same as above just using a different object for ease later
-
-    for i in range(LEADERRANGE[0]-1, LEADERRANGE[1]):
-        l = ods["Sheet1"][i]
-        print(l)
-        if inlMinValue <= l[5] <= inlMaxValue:
-            e = leader(l[0], l[1], l[2], l[3], l[4],l[6],l[7])
-            level6.append(e)
-        else:
-
-            level6.append({"name": l[0], "error": "wrong values"})
-            throwErr("total", f"{file}:{l[0]}")
+    # For each range in ranges
+    for ran in RANGES:
+        # Go through each row in that range
+        for interval in range(ran[0]-1,ran[1]):
+            # read the row, check if the values are right, and add it to the right dictionary
+            currentRow = ods["Sheet1"][interval]
+            e = ""
+            if inlMinValue <= currentRow[5] <= inlMaxValue:
+                e = cRow(currentRow[0], [currentRow[1], currentRow[2], currentRow[3], currentRow[4]], [currentRow[6], currentRow[7]])
+            else:
+                e = {"name": currentRow[0], "error": "wrong values"}
+                throwErr("total", f"{file}:{currentRow[0]}")
+            # automate headings later
+            if ran == RANGES[1]:
+                level6.append(e)
+            else:
+                level5.append(e)            
 
 
 
 def convert_xsl_dict(file, inlMaxValue=40, inlMinValue=0):
     xsl = oxl.load_workbook(PATH + "/" + file)
     sht = xsl.active
-    for row in sht.iter_rows(min_row=CLASSRANGE[0]+1, max_row=CLASSRANGE[1]+1, min_col=0, max_col=10):
-        n = row[0].value
-        r = row[1].value
-        t = row[2].value
-        c = row[3].value
-        p = row[4].value
-        ps = row[6].value
-        ng = row[7].value
 
-        
-        if inlMinValue <= r + t + c + p <= inlMaxValue:
-            e = person(n, r, t, c, p, ps, ng)
-            level5.append(e)
+    for ran in RANGES:
+        check = 0
+        if ran == RANGES[1]:
+            skew = [1,1]
+            check = 1
         else:
-            if n != "Members":
-                level5.append({"name": n, "error": "wrong values"})
-            throwErr("total", f"{file}:{n}")
+            skew = [0,0]
 
-    for row in sht.iter_rows(min_row=LEADERRANGE[0]+1, max_row=LEADERRANGE[1]+1, min_col=0, max_col=10):
-        n = row[0].value
-        r = row[1].value
-        t = row[2].value
-        c = row[3].value
-        p = row[4].value
-        ps = row[6].value
-        ng = row[7].value
+        for row in sht.iter_rows(min_row=ran[0]+skew[0], max_row=ran[1]+skew[1], min_col=0, max_col=10):
+            key = row[0].value
+            values = [row[1].value, row[2].value, row[3].value, row[4].value]
+            strings = [row[6].value, row[7].value]
+            if inlMinValue <= sum_array(values) <= inlMaxValue:
+                e = cRow(key, values, strings)
+            else:
+                e = {"name": key, "error": "wrong values"}
+                throwErr("total", f"{file}:{key}")
+            
+            if check == 0:
+                level5.append(e)
+            else:
+                level6.append(e)
 
-        if inlMinValue <= r + t + c + p <= inlMaxValue:
-            e = leader(n, r, t, c, p, ps, ng)
-            level6.append(e)
-        else:
 
-            level6.append({"name": n, "error": "wrong values"})
-            throwErr("total", f"{file}:{n}")
 
 
 
