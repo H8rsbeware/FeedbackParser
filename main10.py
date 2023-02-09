@@ -139,7 +139,7 @@ def main():
 
 
     # Quick check to make sure all data is obtained, should equal 12 and 4 respectively (class amounts)
-    print(f"classmates accounted : {len(level5sort)}\nleaders accounted    : {len(level6sort)}")
+    print(f"classmates accounted : {len(level5sort)}\nleaders accounted    : {len(level6sort)}\ntotal files     : {len(level5) + len(level6) / amountOfFiles}")
 
 # Gets all scores for a person, averages them, writes then, and then creates a seperate feedback file
 def file_writer(writer, entity, dict, row):
@@ -222,41 +222,36 @@ def convert_ods_dict(file, inlMaxValue=40, inlMinValue=0):
     # for each team member
     for i in range(CLASSRANGE[0], CLASSRANGE[1] + 1):
         # grab their row
-        meCheck = False
         p = ods["Sheet1"][i]
-        me = p[8]
+        print(p)
         # make sure their score is correctly inputted or throw an error
         if inlMinValue <= p[5] <= inlMaxValue:
             # create object and add it to stores
             e = person(p[0], p[1], p[2], p[3], p[4], p[6], p[7])
             level5.append(e)
-        elif me == 1 and meCheck is False:
-            meCheck = True
         else:
             level5.append({"name":p[0], "error":"wrong values"})
             throwErr("total", f"{file}:{p[0]}")
 
     # works the same as above just using a different object for ease later
-    for i in range(LEADERRANGE[0], LEADERRANGE[1] + 1):
-        meCheck = False
+
+    for i in range(LEADERRANGE[0]-1, LEADERRANGE[1]):
         l = ods["Sheet1"][i]
-        me = l[8]
+        print(l)
         if inlMinValue <= l[5] <= inlMaxValue:
             e = leader(l[0], l[1], l[2], l[3], l[4],l[6],l[7])
             level6.append(e)
-        elif me == 1 and meCheck is False:
-            meCheck = True
         else:
 
             level6.append({"name": l[0], "error": "wrong values"})
             throwErr("total", f"{file}:{l[0]}")
 
+
+
 def convert_xsl_dict(file, inlMaxValue=40, inlMinValue=0):
     xsl = oxl.load_workbook(PATH + "/" + file)
     sht = xsl.active
     for row in sht.iter_rows(min_row=CLASSRANGE[0]+1, max_row=CLASSRANGE[1]+1, min_col=0, max_col=10):
-        meCheck = False
-        me = row[8].value
         n = row[0].value
         r = row[1].value
         t = row[2].value
@@ -265,19 +260,16 @@ def convert_xsl_dict(file, inlMaxValue=40, inlMinValue=0):
         ps = row[6].value
         ng = row[7].value
 
+        
         if inlMinValue <= r + t + c + p <= inlMaxValue:
             e = person(n, r, t, c, p, ps, ng)
             level5.append(e)
-        elif me == 1 and meCheck is False:
-            meCheck = True
         else:
             if n != "Members":
                 level5.append({"name": n, "error": "wrong values"})
             throwErr("total", f"{file}:{n}")
 
     for row in sht.iter_rows(min_row=LEADERRANGE[0]+1, max_row=LEADERRANGE[1]+1, min_col=0, max_col=10):
-        meCheck = False
-        me = row[8].value
         n = row[0].value
         r = row[1].value
         t = row[2].value
@@ -289,8 +281,6 @@ def convert_xsl_dict(file, inlMaxValue=40, inlMinValue=0):
         if inlMinValue <= r + t + c + p <= inlMaxValue:
             e = leader(n, r, t, c, p, ps, ng)
             level6.append(e)
-        elif me == 1 and meCheck is False:
-            meCheck = True
         else:
 
             level6.append({"name": n, "error": "wrong values"})
@@ -318,3 +308,22 @@ def throwErr(err = "", loc = ""):
 if __name__ == '__main__':
     main()
 
+
+# Inputs : 
+#   xlsx, xls, ods, csv
+#   Conversion to standard row class (name, [row values], [[row strings])
+#   selectable Row ranges, catagories, column ranges, checks, spreadsheet rules.
+# Manipulations : 
+#   Averages - Mean Mode Median
+#   Graphs - Bar Pie Scatter 
+#       Identify best maybe
+#   Organise, Split, and manipulate string values, and create txt files containing them
+# Outputs :
+#   Excel sheets, ODS sheets, Txt files, Json
+
+# !FUTURE PLANS!
+#   Form/File creator for input and output forms
+#   JS local front end for inputing data forms and creating them 
+#               (ps, i suggest looking at the json output on the repo, it will be useful for raw data.)
+#   Graph visualisation and selection on app
+#   Independence but support for excel and ods
