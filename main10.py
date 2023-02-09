@@ -8,11 +8,9 @@ import json
 from os import listdir
 from os.path import isfile, join
 
-
 # Constants
 PATH = "/home/user/Documents/UnweightedFeedback"
 RESULT = "/home/user/Documents/FeedbackOutput"
-
 RANGES = [[2,13],[16,19]]
 
 # Stores bulk data from file reads
@@ -29,7 +27,6 @@ class cRow:
         return f"{self.key} : \n\tvalues:{str(self.values)}\n\tstrings:{str(self.strings)}"
     def getCSV(self):
         return [self.key, self.values, self.strings]
-
 
 def main():
     # grabs file names from a path
@@ -53,12 +50,8 @@ def main():
             throwErr("format", file)
 
     # Dictonaries to hold sorted values
-    level5sort = {
-    }
-    level6sort = {
-
-    }
-
+    level5sort = {}
+    level6sort = {}
     # condenses the raw data into 1 instance per person
     for entry in level5:
         level5sort = condense_dict(level5sort, entry)
@@ -110,7 +103,6 @@ def main():
     # Saves the files
     file.save(f"{RESULT}/Week-x-Averages.xlsx")
 
-
     # Quick check to make sure all data is obtained, should equal 12 and 4 respectively (class amounts)
     print(f"classmates accounted : {len(level5sort)}\nleaders accounted    : {len(level6sort)}\ntotal files     : {len(level5) + len(level6) / amountOfFiles}")
 
@@ -150,7 +142,6 @@ def file_writer(writer, entity, dict, row):
     # Closes the file
     f.close()
 
-
 # Returns all instances under a dict or sub dict of a key as an array
 def return_instances(key, dict):
     res = [sub[str(key)] for sub in dict]
@@ -166,7 +157,6 @@ def sum_array(array):
 
     except TypeError:
         return throwErr(err="type")
-
 
 def condense_dict(dict, entry):
         # These are poorly named variables, dont look
@@ -185,7 +175,6 @@ def condense_dict(dict, entry):
             tempDict[f"s{i}"] = rope
             i += 1
             
-
         # If the output doesnt already contains an instance of the person
         if dict.get(key) is None:
             # Create a new instance
@@ -194,7 +183,6 @@ def condense_dict(dict, entry):
             # if they do already exist, just add the new stats on.
             dict[key].append(tempDict)
         return dict
-
 
 # Both convert_file_dict just take a file type, and change each row into a standard class
 def convert_ods_dict(file, inlMaxValue=40, inlMinValue=0):
@@ -216,8 +204,6 @@ def convert_ods_dict(file, inlMaxValue=40, inlMinValue=0):
                 level6.append(e)
             else:
                 level5.append(e)            
-
-
 
 def convert_xsl_dict(file, inlMaxValue=40, inlMinValue=0):
     xsl = oxl.load_workbook(PATH + "/" + file)
@@ -246,10 +232,6 @@ def convert_xsl_dict(file, inlMaxValue=40, inlMinValue=0):
             else:
                 level6.append(e)
 
-
-
-
-
 # returns a list of file names from a path
 def get_files(directory):
     files = [f for f in listdir(directory) if isfile(join(directory, f))]
@@ -265,11 +247,8 @@ def throwErr(err = "", loc = ""):
         return print("ERROR: theres text in one of the cells or something. wtf?")
     return print("UNHANDLED: im pretty sure this wont ever get triggered")
 
-
-
 if __name__ == '__main__':
     main()
-
 
 # Inputs : 
 #   xlsx, xls, ods, csv
