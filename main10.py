@@ -8,10 +8,15 @@ import json
 from os import listdir
 from os.path import isfile, join
 
+import spreadsheet as st
+
 # Constants
 PATH = "/home/user/Documents/UnweightedFeedback"
 RESULT = "/home/user/Documents/FeedbackOutput"
 RANGES = [[2,13],[16,19]]
+
+VALUES = 4
+STRINGS = 2
 
 # Stores bulk data from file reads
 level5 = []
@@ -23,8 +28,10 @@ class cRow:
         self.key = key
         self.values = values
         self.strings = strings
+
     def __str__(self):
         return f"{self.key} : \n\tvalues:{str(self.values)}\n\tstrings:{str(self.strings)}"
+
     def getCSV(self):
         return [self.key, self.values, self.strings]
 
@@ -81,7 +88,7 @@ def main():
     act["F1"] = "Total avg/40"
 
     row = 2
-    # writes all of the level 5 results and feedback out
+    # writes all the level 5 results and feedback out
     for member in level5sort:
         file_writer(act, member, level5sort, row)
         row += 1
@@ -107,40 +114,52 @@ def main():
     print(f"classmates accounted : {len(level5sort)}\nleaders accounted    : {len(level6sort)}\ntotal files     : {len(level5) + len(level6) / amountOfFiles}")
 
 # Gets all scores for a person, averages them, writes then, and then creates a seperate feedback file
-def file_writer(writer, entity, dict, row):
-    # EXCEL THINGS
-    key = str(entity)
-    ref = dict[key]
-    submissions = len(ref)
-    # Averages are calculated (sum of scores in category, divided by responses to that category
-    avgC1 = sum_array(return_instances("v1", ref)) / submissions
-    avgC2 = sum_array(return_instances("v2", ref)) / submissions
-    avgC3 = sum_array(return_instances("v3", ref)) / submissions
-    avgC4 = sum_array(return_instances("v4", ref)) / submissions
-    avgTotal = (avgC1 + avgC2 + avgC3 + avgC4)
-    # Writes them to the spreadsheet
-    writer[f"A{row}"] = key
-    writer[f"B{row}"] = avgC1
-    writer[f"C{row}"] = avgC2
-    writer[f"D{row}"] = avgC3
-    writer[f"E{row}"] = avgC4
-    writer[f"F{row}"] = avgTotal
+def file_writer(writer, entity, dict, row, ):
 
-    # POSITIVE AND NEGATIVE POINT HANDLING
-    # creates a new file under the persons name
-    f = open(f"{RESULT}/{key}-feedback.txt","a")
-    pos = return_instances("s1", ref)
-    neg = return_instances("s2",ref)
-    # Adds all positive feedback
-    f.write("What to do more of:\n")
-    for point in pos:
-        f.write(f"\t{point}\n")
-    # Adds all negative feedback
-    f.write("What to do less of:\n")
-    for point in neg:
-        f.write(f"\t{point}\n")
-    # Closes the file
+    mean = average_mean_row_format(str(entity), dict)
+    print(mean)
+    i = 1
+    # for all average/return values for a key
+    for value in mean:
+        # converts the int into a char, adds the value to that location on the spreadsheet
+        writer[f"{st.simple_i2a(i)}{row}"] = value
+        i += 1
+
+    anon_form_format(str(entity), dict, ["What to keep doing:\n", "What to do less:\n"])
+
+
+# finds the average of column values for a key
+def average_mean_row_format(key:str, sorted:dict) -> []:
+    i = 1
+    ref = sorted[key]
+    total = 0
+    format = []
+    format.append(key)
+    while i < VALUES+1:
+        avgVal = sum_array(return_instances(f"v{i}", ref)) / len(ref)
+        total += avgVal
+        format.append(avgVal)
+        i += 1
+    format.append(total)
+    return format
+
+
+# splits string feedback into categories for a key
+def anon_form_format(key:str, sorted:dict, headers:[str]):
+    strings = []
+    ref = sorted[key]
+    i = 1
+
+    f = open(f"{RESULT}/{key}--feedback.txt","a")
+
+    while i < STRINGS+1:
+        category = return_instances(f"s{i}", ref)
+        f.write(headers[i-1] or f"category {i}")
+        for point in category:
+            f.write(f"\t{point}\n")
+        i += 1
     f.close()
+
 
 # Returns all instances under a dict or sub dict of a key as an array
 def return_instances(key, dict):
@@ -246,6 +265,7 @@ def throwErr(err = "", loc = ""):
     if err == "type":
         return print("ERROR: theres text in one of the cells or something. wtf?")
     return print("UNHANDLED: im pretty sure this wont ever get triggered")
+
 
 if __name__ == '__main__':
     main()
