@@ -1,0 +1,66 @@
+{% extends 'boiler.html' %}
+
+{% block head %}
+    <title>T.I.T.S</title>
+{% endblock %}
+
+{% block body %}
+<div class="bg-slate-500 text-white">
+    <h1 class="text-2xl">Totally ingenious tallying system</h1>
+
+    <div class="grid grid-cols-2, sm:grid-cols-1 gap-5">
+        <section class="justify-center bg-slate-600 p-5 w-5/12 md:w-auto sm:w-7/12 mx-auto rounded-xl shadow-lg flex items-center">
+        <div class="grid grid-rows-2">
+            <div class="p-3">
+                <label class="text-xl font-medium" for="rowl rowh">Rows</label>
+                <!-- <input class="focus:outline-none text-black block px-3 py-1.5 my-2 text-base border border-solid border-white rounded" type="number" min="1" value="1" id="rowl"> -->
+                <input class="focus:outline-none text-black block px-3 py-1.5 my-2 text-base border border-solid border-white rounded" type="number" min="2" value="{{request.form.rows}}" placeholder="3" id="rowh">
+            </div>
+            <div class="p-3">
+                <label class="text-xl font-medium" for="coll colh">Columns</label>
+                <!-- <input class="focus:outline-none text-black block px-3 py-1.5 my-2 text-base border border-solid border-white rounded" type="number" min="1" value="1" id="coll"> -->
+                <input class="focus:outline-none text-black block px-3 py-1.5 my-2 text-base border border-solid border-white rounded" type="number" min="2" value="{{request.form.cols}}" placeholder="5" id="colh">
+            </div>
+            <br>
+            <div class="text-center justify-center w-auto hover:bg-slate-500 border border-solid border-slate-500 p-2 rounded" onclick="generateTable();">
+                <input class="text-lg" type="button" value="Generate"> 
+            </div> 
+        </div>
+
+        </section>
+
+        <!-- <section class="bg-slate-600 p-5 w-5/12 mx-auto rounded-xl shadow-lg flex items-center">
+            <div>
+
+            </div>
+        </section> -->
+    </div>    
+
+
+    <div class="grid grid-cols-1">
+        <section class="grid grid-rows-12 auto-rows-min bg-slate-600 w-auto mx-auto rounded-xl shadow-lg flex items-center m-10 p-2">
+            <form>
+            <table class="row-span-11 w-11/12 table-auto" id="table">
+
+            </table>
+            <div class="row-span-1 text-center justify-center w-40 hover:bg-slate-500 border border-solid border-slate-500 py-1 rounded" onclick="create();">
+                <input class="text-lg" type="submit" value="Create"> 
+            </div> 
+            </form>
+        </section>
+
+    </div>
+</div>
+
+
+
+
+
+{% endblock %}
+
+{% block scripts %}
+{{ super() }}
+
+<script src="{{ url_for('static', filename='frontend/tablebuilder.js')}}"></script>
+
+{% endblock %}
