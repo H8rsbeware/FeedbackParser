@@ -10,7 +10,7 @@ class spreadsheet:
         self.values = catagories
         self.rows = self.getRows()
         self.cols = self.getColumns()
-
+        
     def getRows(self) -> int:
         length = len(self.keys)
         return length
@@ -32,7 +32,7 @@ class spreadsheet:
 
         i = 0
         while i < self.cols:
-            activeFile[f"{simple_i2a(i+1)}1"] = self.values[i]
+            activeFile[f"{simple_i2a(i+1)}1"] = self.values[i][0]
             i += 1
 
         createFile.save(f"{saveLocation}/{self.name}.xlsx")

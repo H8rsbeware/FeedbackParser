@@ -19,7 +19,7 @@
             <div class="p-3">
                 <label class="text-xl font-medium" for="coll colh">Columns</label>
                 <!-- <input class="focus:outline-none text-black block px-3 py-1.5 my-2 text-base border border-solid border-white rounded" type="number" min="1" value="1" id="coll"> -->
-                <input class="focus:outline-none text-black block px-3 py-1.5 my-2 text-base border border-solid border-white rounded" type="number" min="2" value="{{request.form.cols}}" placeholder="5" id="colh">
+                <input class="focus:outline-none text-black block px-3 py-1.5 my-2 text-base border border-solid border-white rounded" type="number" min="2" value="{{request.form.cols}}" placeholder="5" max="20" id="colh">
             </div>
             <br>
             <div class="text-center justify-center w-auto hover:bg-slate-500 border border-solid border-slate-500 p-2 rounded" onclick="generateTable();">

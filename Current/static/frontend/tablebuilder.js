@@ -9,7 +9,32 @@ function generateTable(c=5, r=3){
 
     i = 0
     j = 0
+
     while(i < r){
+        if(i == 1){
+            x = 0
+            table += "<tr>"
+
+            while(x < c){
+                if (x > 0){
+                    table += `  
+                    <td style="padding:3px 5px;"> 
+                        <select id="t${x}" placeholder="Type">
+                            <option value="number"> Number    </option>
+                            <option value="short" > Short text</option>
+                            <option value="long"  > Long text </option>
+                            <option value="date"  > Date      </option>
+                        </select>
+                    </td>`
+                }else{
+                    table += `<td></td>`
+                }
+                x++
+            }
+            table += "</tr>"
+
+        }
+
         table += "<tr>"
         
         while(j < c){
@@ -20,6 +45,7 @@ function generateTable(c=5, r=3){
                 }
                 else{
                     table += `<th style="padding:3px 5px;"> <input id="h${j}" type="text" placeholder="header" style="width:80px; color:black;"> </th>`
+
                 }
             }
             else{
@@ -66,7 +92,7 @@ function create(c=5, r=3){
     columns = []
     j = 0
     while(j < c){
-        columns.push($(`#h${j}`).val())
+        columns.push([$(`#h${j}`).val(), $(`#t${j}`).val()])
         j++
     }
 
