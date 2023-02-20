@@ -64,13 +64,13 @@ function create(c=5, r=3){
         i++
     }
     columns = []
-    j = 1
+    j = 0
     while(j < c){
         columns.push($(`#h${j}`).val())
         j++
     }
 
-    jsonObject[$("#h0").val()] = keys
+    jsonObject["Keys"] = keys
     
     jsonObject["Catagories"] = columns
 
@@ -88,7 +88,7 @@ function ajax(data){
         data: JSON.stringify(data),
         dataType: "json",
         success: function(response){
-            console.log(response)
+            console.table(response)
         },
         error : function(err){
             console.error(err);
