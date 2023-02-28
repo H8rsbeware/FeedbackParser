@@ -20,15 +20,25 @@ def index():
     else:
         return render_template('index.html')
 
+@app.route("/parse", methods=['POST', 'GET'])
+def parse():
+    return render_template('parse.html')
+
 
 @app.route("/postmethod", methods =["POST"])
-def postmethod():
+def postCreated():
     data = request.get_json()
     print(data["Keys"], data["Catagories"])
     sheet = cr.spreadsheet(data["Keys"], data["Catagories"], "Created")
     sheet.create(f"{RESULT}")
     return render_template('created.html')
     
+
+@app.route("/sheetupload", methods=["POST"])
+def postParse():
+    data = request.files
+    print(data)
+    return render_template('created.html')
     
 
 

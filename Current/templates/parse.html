@@ -1,0 +1,56 @@
+{% extends 'boiler.html' %}
+
+{% block head %}
+    <title>T.I.T.S</title>
+{% endblock %}
+
+{% block body %}
+    
+<div class="bg-slate-500 text-white">
+    {{ headerBar("1") }}
+</div>
+
+<div class="grid grid-cols-3 grid-rows-1 gap-5 flex justify-center mx-auto w-7/12 md:w-9/12 sm:w-11/12 p-4">
+    <div class="flex col-span-2 bg-slate-600 rounded-xl w-auto text-lg text-white p-4">
+        <form id="upload-files" method="post" enctype="multipart/form-data">
+            <fieldset class="mx-3 mt-3">
+                <label for="file">Upload Sheets : </label>
+                <input class="ml-6" name="file" id="browseFiles" type="file" accept=".xlsx, .xls, .ods"  multiple>
+            </fieldset>
+            <br>
+            <div id="fileList">
+                <!-- GENERATED -->
+            </div>
+            <br>
+            <fieldset>
+                <button id="upload-btn" type="button" class="justify-right border border-solid p-1 mx-3 mb-3 border-slate-500 rounded-lg hover:text-slate-400">Confirm</button>
+            </fieldset>
+        </form>
+    </div>
+
+    <div class="col-span-1 bg-slate-600 rounded-x w-auto text-lg text-white p-4 rounded-xl"> 
+        <h2 class="text-xl font-semibold">Upload Process</h2>
+        <div class="ml-3">
+            <h4 class="font-medium">File types</h4>
+            <ul class="text-md ml-3">
+                <li>- .ods</li>
+                <li>- .xlsx</li>
+                <li>- .xls</li>
+            </ul>
+        </div>
+
+        <p class="ml-3">Select an average type</p>
+
+    </div>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+
+{{ super() }}
+
+<script src="{{ url_for('static', filename='frontend/fileupload.js')}}"></script>
+
+{% endblock %}
+    
